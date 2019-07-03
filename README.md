@@ -16,5 +16,6 @@ Pre-requisites to run the code:
     The second image will display the feet outlines.   
     The first image is saved as "hsvimg.jpeg"  
     The second image is saved as "outline.jpeg"  
+
 # V Sample Images of output have been attached in 'SampleImages' folder
-    
+
