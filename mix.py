@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
 
-img = cv2.imread('images/img5.jpeg',0)
+img = cv2.imread('images/img1.jpeg',0)
 
 
 height, width = img.shape[:2]
