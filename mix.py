@@ -1,11 +1,9 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from PIL import Image
+import matplotlib.patches as mpatches
 
-img = cv2.imread('images/img5.jpeg',0)
-
-
+img = cv2.imread("images/img5.jpeg")
 height, width = img.shape[:2]
 print("width")
 print(width)
@@ -14,7 +12,7 @@ print(height)
 width_half = int(width/2)
 height_half = height/2
 
-crop_img = img[100:height, 50:530]
+crop_img = img[100:height, 90:530]
 cv2.imwrite("cropped.jpeg",crop_img)
 
 IMAGE = "cropped.jpeg"
@@ -32,37 +30,45 @@ mask = cv2.inRange(hsv, lower_white, upper_white)
 # # Bitwise-AND mask and original image
 res = cv2.bitwise_and(hsv,hsv, mask= mask)
 
-v  = hsv[:, :, 0]
-v_mask_new = hsv[:, :, 2] < 220
 
-v[v_mask_new]=255
-v[~v_mask_new]=100
+RED 	= 	[255, 0, 0]	
+ORANGE  = 	[255, 127, 0]	
+YELLOW  = 	[255,255,0]
+GREEN   = 	[0,255,0]
+BLUE    = 	[0,0,255]
+WHITE   = 	[255,255,255]
 
-cv2.imwrite('hsvimg.jpeg',hsv)
+copy_of_hsv = hsv
+inv_hsv = np.invert(hsv)
 
-height, width = img.shape[:2]
-print("cropped width")
-print(width)
-print("cropped height")
-print(height)
+for i in range(height):
+	for j in range(width):
+		if(j>180 and j<280):
+			inv_hsv[i][j] = WHITE
+		elif(inv_hsv[i][j][2]>=0 and inv_hsv[i][j][2]<5):
+			inv_hsv[i][j] = RED											#RED
+		elif(inv_hsv[i][j][2]>=5 and inv_hsv[i][j][2]<10):
+			inv_hsv[i][j] = ORANGE										#ORANGE
+		elif(inv_hsv[i][j][2]>=10 and inv_hsv[i][j][2]<15):
+			inv_hsv[i][j] = YELLOW										#YELLOW
+		elif(inv_hsv[i][j][2]>=15 and inv_hsv[i][j][2]<30):
+			inv_hsv[i][j] = GREEN										#GREEN
+		elif(inv_hsv[i][j][2]>=30 and inv_hsv[i][j][2]<100):
+			inv_hsv[i][j] = BLUE										#BLUE
+		else:
+			inv_hsv[i][j] = WHITE										#WHITE
 
-edges = cv2.Canny(crop_img,200,255)
-inv_edges = np.invert(edges)
+v = inv_hsv[:, :, 2]
 
-# plt.subplot(121),plt.imshow(crop_img,cmap = 'gray')
-plt.title('Original Image'), plt.xticks([]), plt.yticks([])
-# plt.subplot(122),plt.imshow(inv_edges,cmap = 'gray')
-plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
+plt.imshow(inv_hsv)
+red_patch = mpatches.Patch(color='red', label='Highest pressure')
+orange_patch = mpatches.Patch(color='orange', label='High pressure')
+yellow_patch = mpatches.Patch(color='yellow', label='Medium pressure')
+green_patch  = mpatches.Patch(color='green', label='Low pressure')
+blue_patch = mpatches.Patch(color='blue', label='Lowest pressure')
 
-alpha = 0.2
-beta  = 1-alpha
+plt.legend(handles=[red_patch, orange_patch, yellow_patch, green_patch, blue_patch])
 
-img2 = cv2.imread('hsvimg.jpeg',0)
-dst = cv2.addWeighted(img2, alpha, inv_edges, beta, 0.0)
-cv2.imwrite('outline.jpeg',dst)
+plt.show()
 
-cv2.imshow('Pressure Points',hsv)
-cv2.imshow('Outlines',dst)
-
-cv2.waitKey(0)
-
+plt.close()
